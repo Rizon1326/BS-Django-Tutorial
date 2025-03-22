@@ -273,6 +273,3 @@ Joined: 2025-03-21 16:23
 
 ---
 
-Let me know once this is 100% clear. Then I’ll take you to the **same app using Django REST Framework (DRF) + JWT authentication**, step-by-step.
-
-Would you like me to zip this project or upload to GitHub too?
