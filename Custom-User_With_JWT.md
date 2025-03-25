@@ -1,7 +1,7 @@
 
 The **`AbstractBaseUser`** class in Django provides several built-in functionalities for user management, particularly around authentication. These built-in features help you manage user authentication, password hashing, and basic user-related operations without needing to implement them manually. Here's a breakdown of the key functionalities provided by **`AbstractBaseUser`**:
 
-### 1. **Password Handling**:
+## 1. **Password Handling**:
    - **`set_password(raw_password)`**: This method allows you to securely set a user's password. It automatically hashes the password using Django's default password hashing algorithms. This means the raw password is not stored in the database, ensuring security.
    - **`check_password(raw_password)`**: This method is used to check if a provided password matches the stored hashed password. It is used when verifying a user's login credentials.
    - **`get_password_reset_token()`**: This method generates a token for password reset functionality, which can be sent to the user as part of the password reset process.
