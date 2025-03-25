@@ -31,7 +31,7 @@ The **`AbstractBaseUser`** class in Django provides several built-in functionali
 In short, **`AbstractBaseUser`** gives you a foundational user model with essential authentication features, password management, and access control (via `is_active`, `is_staff`, `is_superuser`). You customize it by adding your own fields (such as `email`, `first_name`, etc.) and behavior to fit your application's needs.
 
 
-# Custom User MOdel
+# Code for Custom User Model
 
 
 ### Step 1: Install Required Libraries
