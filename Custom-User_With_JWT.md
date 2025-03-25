@@ -28,37 +28,49 @@ The **`AbstractBaseUser`** class in Django provides several built-in functionali
 - **Flexibility**: `AbstractBaseUser` allows you to define your own custom fields and authentication mechanisms. This is especially useful if you want to replace the default `username` field with something like `email` or add additional fields.
 - **Built-in Security**: It provides built-in password hashing and secure password storage, so you don’t need to manually handle this important aspect of security.
 
-In short, **`AbstractBaseUser`** gives you a foundational user model with essential authentication features, password management, and access control (via `is_active`, `is_staff`, `is_superuser`). You customize it by adding your own fields (such as `email`, `first_name`, etc.) and behavior to fit your application's needs.
+# BaseUserManager
+
+The **`BaseUserManager`** class in Django provides basic management functionality for creating, managing, and handling user-related operations, particularly in the context of a custom user model. Here are the basic functionalities that **`BaseUserManager`** provides:
+
+### 1. **User Creation Methods**:
+   - **`create_user(email, password=None, **extra_fields)`**:
+     - This method is used to create a regular user. It is responsible for:
+       - Normalizing the email (using `normalize_email`).
+       - Setting the password securely (using `set_password`).
+       - Saving the user instance to the database.
+     - **Purpose**: To create a standard user with a password and any additional fields passed through `extra_fields`.
+   
+   - **`create_superuser(email, password=None, **extra_fields)`**:
+     - This method is used to create a superuser. It is a specialized version of `create_user`, but it ensures that the created user has both the `is_staff` and `is_superuser` flags set to `True`.
+     - **Purpose**: To create a user with superuser privileges (i.e., access to the Django admin panel and full control over the application).
+
+### 2. **Normalizing Email**:
+   - **`normalize_email(email)`**:
+     - This method normalizes the email address by converting it to lowercase (this is important because emails are typically case-insensitive).
+     - **Purpose**: Ensures consistency when storing and comparing email addresses in the database.
+
+### 3. **Custom Manager Setup**:
+   - The **`BaseUserManager`** class is intended to be extended to create a custom user manager for your user model. By creating a custom manager (like `UserManager` in your code), you can add custom user creation methods (e.g., `create_user`, `create_superuser`) and override default behaviors, but still retain the basic functionality like `normalize_email`.
+
+### 4. **Saving User**:
+   - **`user.save(using=self._db)`**: This is part of the `create_user` and `create_superuser` methods. After setting the password and populating the user fields, this function saves the user instance to the database.
+   - **Purpose**: It ensures that the user is properly saved to the database after their details have been processed.
+
+### Summary of Basic Functionalities:
+1. **`create_user`**: Creates a normal user with the required fields (email, password, etc.).
+2. **`create_superuser`**: Creates a superuser with admin privileges.
+3. **`normalize_email`**: Normalizes the email address for consistency and storage.
+4. **Saving**: Handles saving the user instance to the database.
+
+### Why Use **`BaseUserManager`**:
+- It provides the foundation for user creation, password handling, and normalization of the email field.
+- It simplifies the process of creating and managing users (especially superusers).
+- It allows you to extend and customize the behavior of user creation to fit the specific needs of your application (e.g., using email as the unique identifier). 
 
 
 # Code for Custom User Model
 
-
-### Step 1: Install Required Libraries
-
-Before creating the custom user model, make sure you have installed Django and the necessary libraries for REST API:
-
-```bash
-pip install django
-pip install djangorestframework
-```
-
-### Step 2: Set Up Your Django Project and App
-
-First, create a Django project if you haven't done so already:
-
-```bash
-django-admin startproject myproject
-cd myproject
-```
-
-Then create an app (e.g., `users`):
-
-```bash
-python manage.py startapp users
-```
-
-### Step 3: Create the Custom User Model
+### Create the Custom User Model
 
 Now, we’ll create the custom user model. In the `users` app, create a `models.py` file (if it doesn't exist) and define the custom user model.
 
@@ -90,7 +102,55 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                                                                                ### Explanation
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+Explanation of the Code:
+create_user Method:
+
+Purpose: This method is used to create a normal user (not a superuser). It takes email, password, and any other extra fields (extra_fields) as arguments.
+
+Key Actions:
+
+Check if email is provided:
+
+if not email: — This ensures that the email is required for creating a user. If no email is provided, it raises a ValueError.
+
+Normalize the email:
+
+email = self.normalize_email(email) — This normalizes the email address to ensure it is stored in a consistent format (e.g., all lowercase). Django’s normalize_email method helps with consistency when comparing email addresses.
+
+Create the user:
+
+user = self.model(email=email, **extra_fields) — This creates an instance of the User model (which is the custom user model in your code). It initializes the user with the normalized email and any other extra fields that are passed in.
+
+Set the password:
+
+user.set_password(password) — This method is used to hash and securely store the user’s password. The password is never stored in plain text.
+
+Save the user:
+
+user.save(using=self._db) — This saves the user instance to the database. The using=self._db part ensures that the user is saved to the appropriate database (useful when dealing with multiple databases).
+
+create_superuser Method:
+
+Purpose: This method is used to create a superuser, who will have special privileges in the Django admin panel and full access to the application.
+
+Key Actions:
+
+Set default fields:
+
+extra_fields.setdefault('is_staff', True) — This ensures that the superuser will have is_staff set to True (this is a requirement for access to the Django admin panel).
+
+extra_fields.setdefault('is_superuser', True) — This ensures that the superuser will have is_superuser set to True (this grants the user full admin privileges).
+
+Create the superuser:
+
+return self.create_user(email, password, **extra_fields) — Instead of duplicating the logic for creating a superuser, this method calls create_user (the previously defined method). It passes the email, password, and any extra fields (which now include is_staff and is_superuser), thus reusing the user creation logic.
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Step 2: Define the Custom User Model
 class User(AbstractBaseUser):
@@ -122,54 +182,3 @@ class User(AbstractBaseUser):
    - The model includes fields like `email`, `first_name`, `last_name`, `is_active`, `is_staff`, and `date_joined`.
    - The `USERNAME_FIELD` is set to `email`, meaning email will be used for authentication instead of a traditional username.
 
-### Step 4: Configure the Custom User Model in `settings.py`
-
-Now, we need to tell Django that we're using the custom user model instead of the default one. Open `settings.py` and add this line:
-
-```python
-# settings.py
-
-AUTH_USER_MODEL = 'users.User'  # This tells Django to use the custom User model from the 'users' app
-```
-
-### Step 5: Create and Apply Migrations
-
-Once the custom user model is set up, you need to create and apply the migrations:
-
-1. Run the following command to create the migrations for your new model:
-
-```bash
-python manage.py makemigrations users
-```
-
-2. Then, apply the migrations to update the database:
-
-```bash
-python manage.py migrate
-```
-
-### Step 6: Create a Superuser (Optional)
-
-Now that the custom user model is set up and the migrations are applied, you can create a superuser for the admin panel:
-
-```bash
-python manage.py createsuperuser
-```
-
-You’ll be prompted to enter an email, username, and password for the superuser.
-
-### Step 7: Verify the Custom User Model
-
-Once everything is set up, run your Django server:
-
-```bash
-python manage.py runserver
-```
-
-You can now access the Django admin panel at `http://127.0.0.1:8000/admin` and log in with the superuser credentials. You should be able to see your custom `User` model in the admin interface.
-
-### Conclusion
-
-This completes the implementation of the **Custom User Model**. You now have a custom user model that uses email for authentication and includes fields like first name, last name, and password.
-
-Let me know once you have completed this part, and I can guide you on the next step regarding **Email Verification**.
