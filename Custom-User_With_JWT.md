@@ -102,6 +102,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
+```
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                                                      ### Explanation
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -151,7 +152,13 @@ return self.create_user(email, password, **extra_fields) — Instead of duplicat
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                                                     ### Explanation
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+E
+
+```
 # Step 2: Define the Custom User Model
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
@@ -170,6 +177,45 @@ class User(AbstractBaseUser):
     def __str__(self):
         return self.email
 ```
+
+Sure! Let's break down **Step 2**: Defining the **Custom User Model** and explain the code simply:
+
+### Code Explanation:
+
+1. **Inheriting from `AbstractBaseUser`**:
+   - **`class User(AbstractBaseUser):`**
+     - This line creates a custom user model by inheriting from `AbstractBaseUser`, which is a built-in Django class. By doing this, you're customizing the user model to meet your specific needs, like using **email** as the primary user identifier instead of **username**.
+
+2. **Fields of the Custom User Model**:
+   - **`email = models.EmailField(unique=True)`**:
+     - This field is for storing the user's email address. The `unique=True` part ensures that no two users can have the same email in the database.
+   - **`first_name = models.CharField(max_length=255)`**:
+     - This field is for storing the user's first name.
+   - **`last_name = models.CharField(max_length=255)`**:
+     - This field is for storing the user's last name.
+   - **`is_active = models.BooleanField(default=True)`**:
+     - This field indicates if the user account is active. By default, it is set to `True` (meaning the user can log in).
+   - **`is_staff = models.BooleanField(default=False)`**:
+     - This field indicates whether the user is a staff member (able to access the Django admin panel). It is `False` by default.
+   - **`date_joined = models.DateTimeField(default=timezone.now)`**:
+     - This field records the date and time when the user joined (created the account). By default, it is set to the current date and time.
+
+3. **Custom Manager**:
+   - **`objects = UserManager()`**:
+     - This line assigns the custom manager `UserManager` to the `objects` attribute of the model. It allows you to use the `create_user()` and `create_superuser()` methods defined in `UserManager` for creating regular users and superusers.
+
+4. **`USERNAME_FIELD`**:
+   - **`USERNAME_FIELD = 'email'`**:
+     - This line specifies that **email** will be used as the **username** for the user model. Normally, Django uses `username` as the login field, but here you are making email the unique identifier for logging in.
+
+5. **`REQUIRED_FIELDS`**:
+   - **`REQUIRED_FIELDS = ['first_name', 'last_name']`**:
+     - This list defines the fields that are required during **user creation**. In this case, when you create a user, you must provide **first name** and **last name** in addition to the **email**. 
+     - **Note**: `email` is not listed here because it's used as the `USERNAME_FIELD`, so Django automatically considers it a required field during user creation.
+
+6. **String Representation**:
+   - **`def __str__(self): return self.email`**:
+     - This method defines how the user object will be displayed when you print it or look at it in the Django admin panel. In this case, it will display the user's email.
 
 ### Explanation of the Code:
 
