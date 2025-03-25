@@ -110,43 +110,43 @@ class UserManager(BaseUserManager):
 Explanation of the Code:
 create_user Method:
 
-Purpose: This method is used to create a normal user (not a superuser). It takes email, password, and any other extra fields (extra_fields) as arguments.
+#### Purpose: This method is used to create a normal user (not a superuser). It takes email, password, and any other extra fields (extra_fields) as arguments.
 
 Key Actions:
 
-Check if email is provided:
+#### Check if email is provided:
 
 if not email: — This ensures that the email is required for creating a user. If no email is provided, it raises a ValueError.
 
-Normalize the email:
+#### Normalize the email:
 
 email = self.normalize_email(email) — This normalizes the email address to ensure it is stored in a consistent format (e.g., all lowercase). Django’s normalize_email method helps with consistency when comparing email addresses.
 
-Create the user:
+#### Create the user:
 
 user = self.model(email=email, **extra_fields) — This creates an instance of the User model (which is the custom user model in your code). It initializes the user with the normalized email and any other extra fields that are passed in.
 
-Set the password:
+#### Set the password:
 
 user.set_password(password) — This method is used to hash and securely store the user’s password. The password is never stored in plain text.
 
-Save the user:
+#### Save the user:
 
 user.save(using=self._db) — This saves the user instance to the database. The using=self._db part ensures that the user is saved to the appropriate database (useful when dealing with multiple databases).
 
-create_superuser Method:
+#### create_superuser Method:
 
 Purpose: This method is used to create a superuser, who will have special privileges in the Django admin panel and full access to the application.
 
-Key Actions:
+#### Key Actions:
 
-Set default fields:
+#### Set default fields:
 
 extra_fields.setdefault('is_staff', True) — This ensures that the superuser will have is_staff set to True (this is a requirement for access to the Django admin panel).
 
 extra_fields.setdefault('is_superuser', True) — This ensures that the superuser will have is_superuser set to True (this grants the user full admin privileges).
 
-Create the superuser:
+#### Create the superuser:
 
 return self.create_user(email, password, **extra_fields) — Instead of duplicating the logic for creating a superuser, this method calls create_user (the previously defined method). It passes the email, password, and any extra fields (which now include is_staff and is_superuser), thus reusing the user creation logic.
 
