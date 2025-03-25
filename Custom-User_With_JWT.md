@@ -1,4 +1,4 @@
-
+# AbstarctBaseUser
 The **`AbstractBaseUser`** class in Django provides several built-in functionalities for user management, particularly around authentication. These built-in features help you manage user authentication, password hashing, and basic user-related operations without needing to implement them manually. Here's a breakdown of the key functionalities provided by **`AbstractBaseUser`**:
 
 ### 1. **Password Handling**:
