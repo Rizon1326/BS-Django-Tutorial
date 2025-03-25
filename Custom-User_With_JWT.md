@@ -1,5 +1,38 @@
 
-Got it! Let's first focus on creating the **Custom User Model** part. I'll guide you step-by-step through the implementation of the custom user model.
+The **`AbstractBaseUser`** class in Django provides several built-in functionalities for user management, particularly around authentication. These built-in features help you manage user authentication, password hashing, and basic user-related operations without needing to implement them manually. Here's a breakdown of the key functionalities provided by **`AbstractBaseUser`**:
+
+### 1. **Password Handling**:
+   - **`set_password(raw_password)`**: This method allows you to securely set a user's password. It automatically hashes the password using Django's default password hashing algorithms. This means the raw password is not stored in the database, ensuring security.
+   - **`check_password(raw_password)`**: This method is used to check if a provided password matches the stored hashed password. It is used when verifying a user's login credentials.
+   - **`get_password_reset_token()`**: This method generates a token for password reset functionality, which can be sent to the user as part of the password reset process.
+
+### 2. **Authentication Methods**:
+   - **`is_authenticated`**: This is a boolean property (True by default) that checks whether the user is authenticated or not. It is essential for the authentication process in Django, indicating whether the user is logged in or not.
+   - **`is_anonymous`**: This property (True by default) checks if the user is anonymous (i.e., not logged in).
+
+### 3. **Date and Time Fields**:
+   - **`date_joined`**: While not explicitly added in `AbstractBaseUser`, this is typically included in custom user models to track when the user was created. Django does not set this automatically, but it can be added by you when extending `AbstractBaseUser`.
+
+### 4. **Basic Fields**:
+   - **`is_active`**: This boolean field (True by default) is used to mark a user as active or inactive. An inactive user cannot log in. This is a commonly used feature for account deactivation in Django projects.
+   - **`is_staff`**: This boolean field determines whether a user is a staff member with access to the Django admin panel. The default value is `False`, and you can set it to `True` to grant staff privileges.
+   - **`is_superuser`**: This boolean field determines whether the user has superuser privileges, giving them access to all parts of the admin panel and unrestricted access to the system. 
+
+### 5. **User Model Behaviors**:
+   - **`USERNAME_FIELD`**: This is a required field that indicates the field used to identify users (by default, Django uses `username`, but here, since you’ve customized it, you would typically set it to `email` in your model). This makes sure the email address or any other field you choose is used as the primary identifier for logging in.
+
+### 6. **Serialization and Querying**:
+   - Since `AbstractBaseUser` is a subclass of `models.Model`, it provides all the basic ORM functionalities (such as `.save()`, `.delete()`, `.filter()`, etc.) that are available to all Django models, making it easy to query and interact with user records in the database.
+   
+### Why Use `AbstractBaseUser`:
+- **Flexibility**: `AbstractBaseUser` allows you to define your own custom fields and authentication mechanisms. This is especially useful if you want to replace the default `username` field with something like `email` or add additional fields.
+- **Built-in Security**: It provides built-in password hashing and secure password storage, so you don’t need to manually handle this important aspect of security.
+
+In short, **`AbstractBaseUser`** gives you a foundational user model with essential authentication features, password management, and access control (via `is_active`, `is_staff`, `is_superuser`). You customize it by adding your own fields (such as `email`, `first_name`, etc.) and behavior to fit your application's needs.
+
+
+### Custom User MOdel
+
 
 ### Step 1: Install Required Libraries
 
