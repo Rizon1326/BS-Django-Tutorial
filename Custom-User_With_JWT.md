@@ -156,9 +156,7 @@ return self.create_user(email, password, **extra_fields) — Instead of duplicat
                                                      ### Explanation
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-E
-
-```
+```python
 # Step 2: Define the Custom User Model
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
